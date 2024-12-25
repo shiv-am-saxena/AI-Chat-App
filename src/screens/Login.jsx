@@ -10,7 +10,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
     const { isLoading, error } = useSelector((state) => state.user);
-
+    
     const handleLogin = async (e) => {
         e.preventDefault();
         dispatch(setLoading()); // Set loading state
@@ -28,7 +28,7 @@ const Login = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-[79vh] max-h-screen p-5 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="flex items-center justify-center h-[calc(100vh-136px)] p-5 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
             <div className="w-full max-w-md p-8 bg-gray-700 rounded-lg shadow-lg">
                 <h2 className="mb-6 text-3xl font-extrabold text-center text-white">Welcome Back</h2>
                 {error && (
@@ -70,7 +70,7 @@ const Login = () => {
                 </form>
                 <p className="mt-4 text-sm text-center text-gray-300">
                     Don&apos;t have an account?{' '}
-                    <Link to="/register" className="text-blue-400 hover:underline">
+                    <Link to="/signup" className="text-blue-400 hover:underline">
                         Create one
                     </Link>
                 </p>

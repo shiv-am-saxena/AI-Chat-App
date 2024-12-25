@@ -27,7 +27,7 @@ const Register = () => {
     };
 
     return (
-        <div className="flex items-center justify-center h-[79vh] p-5 max-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="flex items-center justify-center h-[calc(100vh-136px)] p-5 max-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
             <div className="w-full max-w-md p-8 bg-gray-700 rounded-lg shadow-lg">
                 <h2 className="mb-6 text-3xl font-extrabold text-center text-white">Join Us</h2>
                 {error && (
@@ -76,7 +76,7 @@ const Register = () => {
                 </form>
                 <p className="mt-4 text-sm text-center text-gray-300">
                     Already have an account?{' '}
-                    <Link to="/login" className="text-blue-400 hover:underline">
+                    <Link to="/signin" className="text-blue-400 hover:underline">
                         Login
                     </Link>
                 </p>

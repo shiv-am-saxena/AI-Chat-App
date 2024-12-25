@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { cn } from "../lib/utils.js";
 import { motion } from "framer-motion";
-
+import { useSelector } from 'react-redux';
 const transition = {
     duration: 0,
     ease: "linear",
@@ -11,24 +11,24 @@ const transition = {
 const GoogleGeminiEffect = ({
     pathLengths,
     title,
-    description,
-    className
+    description
 }) => {
+    const isAuthenticated = useSelector(state => state.user.isAuthenticated);
     return (
-        (<div className={cn("relative h-full mt-40 w-full ", className)}>
+        (<div className={cn("relative h-full mt-40 w-full ")}>
             <p
                 className="text-3xl md:text-7xl font-normal pb-4 text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-100 to-neutral-300">
                 {title}
             </p>
             <p
                 className="text-md md:text-xl font-normal text-center text-neutral-400 mt-4 max-w-lg mx-auto">
-                {description }
+                {description}
             </p>
             <div
                 className="w-[99vw] h-[200px] md:h-[425px] relative">
-                <Link to="/signup"
+                <Link to={isAuthenticated? "/projects":"/signup"}
                     className="font-semibold text-sm lg:text-md xl:text-lg bg-white rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-black px-5 py-3 z-10 absolute ">
-                    Get Started
+                    {isAuthenticated? "New Chat":"Get Started"}
                 </Link>
                 <svg
                     width="100%"

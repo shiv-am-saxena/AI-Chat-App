@@ -2,7 +2,7 @@ import React from "react";
 
 const Error404 = () => {
     return (
-        <div className="flex items-center justify-center h-[78.35vh] text-white">
+        <div className="flex items-center justify-center h-[calc(100vh-136px)] text-white">
             <div className="text-center">
                 <h1 className="text-9xl font-extrabold text-red-500">404</h1>
                 <h2 className="mt-4 text-4xl font-bold">Page Not Found</h2>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { removeUser, setLoading, setError } from "../context/slices/userState";
 import { FaUserCircle } from "react-icons/fa";
@@ -15,6 +15,7 @@ export default function Navbar() {
         { name: "Sign In", slug: "/signin" },
         { name: "Sign Up", slug: "/signup" },
     ];
+    const navigate = useNavigate();
     const location = useLocation();
 
     const handleMenuToggle = () => {
@@ -40,6 +41,7 @@ export default function Navbar() {
                 dispatch(removeUser());
                 localStorage.removeItem("token");
             }
+            navigate('/');
         } catch (error) {
             dispatch(setError(error.response?.data?.message || "Something went wrong"));
 
@@ -47,7 +49,7 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="h-18 w-full sticky top-0 shadow-md z-10 bg-gray-700">
+        <nav className="h-20 w-full sticky top-0 shadow-md z-10 bg-gray-700">
             <div className="flex justify-between items-center px-5 lg:px-20 py-4">
                 {/* Logo */}
                 <h1 className="text-2xl font-[montserrat] tracking-tighter text-white md:text-4xl">
