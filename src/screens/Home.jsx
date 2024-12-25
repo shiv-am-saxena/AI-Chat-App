@@ -1,5 +1,5 @@
 import { useAnimationFrame, useSpring } from "framer-motion";
-import GoogleGeminiEffect from "../ui/google-gemini-effect";
+import GoogleGeminiEffect from "../ui/Google-gemini-effect";
 
 const Home = () => {
     const progress = useSpring(0, { damping: 10, stiffness: 50 });
