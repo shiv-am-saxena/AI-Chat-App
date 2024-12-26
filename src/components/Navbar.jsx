@@ -53,7 +53,7 @@ export default function Navbar() {
             <div className="flex justify-between items-center px-5 lg:px-20 py-4">
                 {/* Logo */}
                 <h1 className="text-2xl font-[montserrat] tracking-tighter text-white md:text-4xl">
-                    AI Chat App
+                    Adhyay-AI Chat
                 </h1>
 
                 {/* Hamburger Menu */}

@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
+import { CiUser } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
 import { ModalBody, ModalContent, ModalTrigger } from "./AnimatedModal";
@@ -35,7 +36,7 @@ const ChatList = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const response = await axios.post(
+            const response = await axios.put(
                 "/project/addUser",
                 { email, pid },
                 { headers: { Authorization: `Bearer ${token}` } }
@@ -140,8 +141,9 @@ const ChatList = () => {
                 <ul className="flex-1 overflow-y-auto">
                     {chats.map((chat) => (
                         <li key={chat._id} className="p-4 mb-2 rounded-lg bg-gray-700 flex items-center justify-between">
-                            <Link to="#" className="font-bold w-full">
-                                {chat.projectName}
+                            <Link to="#" className=" w-full">
+                                <p className="font-bold text-lg">{chat.projectName}</p>
+                                <p className="flex h-fit gap-1 items-center text-md min-w-10 max-w-fit"><CiUser/> Collaborators : {chat.users.length}</p>
                             </Link>
                             <div className="flex items-center">
                                 <button

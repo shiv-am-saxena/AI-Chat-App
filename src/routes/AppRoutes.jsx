@@ -24,7 +24,7 @@ export default function AppRoutes() {
             };
             dispatch(setLoad())
             try {
-                const response = await axios.get('/', {
+                const response = await axios.get('/temp', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -36,6 +36,9 @@ export default function AppRoutes() {
             }
             finally {
                 setLoading(false);
+                setTimeout(() => {
+                    dispatch(setError(null));
+                }, 5000);
             }
 
 

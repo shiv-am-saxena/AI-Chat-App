@@ -1,7 +1,7 @@
 import { BrowserRouter } from 'react-router-dom';
 import Footer from './components/Footer';
 import AppRoutes from './routes/AppRoutes';
-import Navbar from './screens/Navbar';
+import Navbar from './components/Navbar';
 import { store } from './context/store';
 import { Provider } from 'react-redux';
 import { ModalProvider } from './components/AnimatedModal';

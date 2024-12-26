@@ -24,7 +24,7 @@ const Home = () => {
                     pathLengthFourth,
                     pathLengthFifth,
                 ]}
-                title={"AI Chat App"}
+                title={"Adhyay-AI Chat"}
                 description={"Seamlessly connect with the future of AI-powered communication."}
             />
         </div>
