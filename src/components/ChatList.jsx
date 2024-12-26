@@ -1,85 +1,118 @@
-import { Link, useNavigate } from "react-router-dom";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
-import {
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalTrigger,
-} from "./AnimatedModal";
+import { IoMdClose } from "react-icons/io";
+import { MdDelete } from "react-icons/md";
+import { ModalBody, ModalContent, ModalTrigger } from "./AnimatedModal";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import axios from '../config/axios.js';
-import { MdDelete } from "react-icons/md";
+import axios from "../config/axios.js";
+import { useModal } from "./AnimatedModal";
+import Alert from './Alert.jsx';
 const ChatList = () => {
-    const [chats, setChat] = useState([])
-    const navigate = useNavigate();
-    const { user } = useSelector((state) => state.user);
-    const [error, setError] = useState(null);
+    const { setOpen } = useModal();
+    const [chats, setChats] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [name, setName] = useState('');
-    const [uid, setUid] = useState(user._id);
-    const token = localStorage.getItem('token');
-    const handleSubmit = async (e) => {
+    const [error, setError] = useState(null);
+    const [newProjectName, setNewProjectName] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
+    const [email, setEmail] = useState("");
+    const [pid, setPid] = useState("");
+    const { user } = useSelector((state) => state.user);
+    const token = localStorage.getItem("token");
+    const [alert, setAlert] = useState(null);
+
+    const showAlert = (message, type) => {
+        setAlert({ message, type });
+    };
+    const handleClose = () => {
+        setIsOpen(false);
+        setEmail("");
+        setPid("");
+    };
+
+    const handleUserSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const response = await axios.post('/project/create', { name, userId: uid }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await axios.post(
+                "/project/addUser",
+                { email, pid },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
             const res = await response.data;
-            navigate(`/project/${res.data._id}`);
+            showAlert(res.message, 'success');
+            handleClose();
+        }
+        catch (err) {
+            setError(err.response?.data?.message || "Something went wrong");
+        }
+        finally{
+            setIsLoading(false);
+        }
+
+    };
+
+    const handleCreateProject = async (e) => {
+        e.preventDefault();
+        setError(null);
+        setIsLoading(true);
+        try {
+            const response = await axios.post(
+                "/project/create",
+                { name: newProjectName, userId: user._id },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const res = await response.data;
+            setChats((prev) => [...prev, response.data.data]);
+            setOpen(false);
+            setNewProjectName("");
+            showAlert(res.message, "success");
         } catch (err) {
             setError(err.response?.data?.message || "Something went wrong");
         } finally {
             setIsLoading(false);
         }
-    }
+    };
+
     const handleDelete = async (id) => {
+        setError(null);
         try {
-            await axios.delete(`/project/delete/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+            const response = await axios.delete(`/project/delete/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
             });
-            location.reload();
+            const res = await response.data;
+            showAlert(res.message, 'success');
+            setChats((prev) => prev.filter((chat) => chat._id !== id));
         } catch (err) {
             setError(err.response?.data?.message || "Something went wrong");
         }
-    }
-    useEffect(() => {
-        const fetchProjects = async () => {
-            setIsLoading(true);
-            try {
-                const response = await axios.get('/project/all', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                const res = await response.data;
-                if (res.data.length === 0) {
-                    const obj = [{
-                        _id: '#',
-                        projectName: `You don't have any project to list.`
-                    }]
-                    setChat(obj);
-                } else {
-                    setChat(res.data)
-                }
-            } catch (err) {
-                setError(err.response?.data?.message || "Something went wrong");
-            } finally {
-                setIsLoading(false);
-            }
+    };
+
+    const fetchProjects = async () => {
+        setError(null);
+        setIsLoading(true);
+        try {
+            const response = await axios.get("/project/all", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setChats(response.data.data || []);
+        } catch (err) {
+            setError(err.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
         }
-        fetchProjects();
+    };
+
+    useEffect(() => {
+        if (token) fetchProjects();
     }, [token]);
+
     return (
         <div className="p-4 h-full flex flex-col">
             {/* Back Button */}
             <Link
-                to={'/'}
+                to="/"
                 className="mb-4 w-fit flex items-center text-gray-300 hover:text-white"
             >
                 <svg
@@ -97,81 +130,154 @@ const ChatList = () => {
                 Back
             </Link>
 
-            {/* Chats List */}
+            {/* Project List */}
             <h2 className="text-xl font-semibold mb-4 hidden sm:block">Projects</h2>
-            {isLoading ? (<div className="flex h-[calc(100vh-136px)] w-full items-center justify-center"><h1>Loading...</h1></div>) :
-                (<ul className="flex-1 overflow-y-auto">
-                    {chats.map((chat, index) => (
-                        <li
-                            key={index}
-                        >
-                            <p className="p-4 mb-2 rounded-lg bg-gray-700 flex items-center justify-between hover:bg-gray-600 cursor-pointer "><Link to={'#'}
-                                className="font-bold w-full">{chat.projectName}</Link> <button className="bg-gray-800 p-2 rounded-full z-50" onClick={() => { handleDelete(chat._id) }}><MdDelete /></button></p>
+            {isLoading ? (
+                <div className="flex h-[calc(100vh-136px)] w-full items-center justify-center">
+                    <h1>Loading...</h1>
+                </div>
+            ) : (
+                <ul className="flex-1 overflow-y-auto">
+                    {chats.map((chat) => (
+                        <li key={chat._id} className="p-4 mb-2 rounded-lg bg-gray-700 flex items-center justify-between">
+                            <Link to="#" className="font-bold w-full">
+                                {chat.projectName}
+                            </Link>
+                            <div className="flex items-center">
+                                <button
+                                    className="bg-gray-800 p-2 mr-1 rounded-full"
+                                    onClick={() => {
+                                        setIsOpen(true);
+                                        setPid(chat._id)
+                                    }}
+                                >
+                                    <FaPlus />
+                                </button>
+                                <button
+                                    className="bg-gray-800 p-2 ml-1 rounded-full"
+                                    onClick={() => handleDelete(chat._id)}
+                                >
+                                    <MdDelete />
+                                </button>
+                            </div>
                         </li>
                     ))}
-                    <div className="p-4 mb-2 rounded-lg flex items-center justify-center">
-                        <Modal>
-                            <ModalTrigger
-                                className="bg-gray-700 text-white flex justify-center hover:bg-gray-600 cursor-pointer group/modal-btn">
-                                <span
-                                    className="group-hover/modal-btn:translate-x-40 text-center transition duration-500">
-                                    New Chat
-                                </span>
-                                <div
-                                    className="-translate-x-40 group-hover/modal-btn:translate-x-0 flex items-center justify-center absolute inset-0 transition duration-500 text-white z-20">
-                                    <div className="bg-gray-700 p-2 rounded-full text-white">
-                                        <FaPlus color="#d1d5db" />
-                                    </div>
-                                </div>
-                            </ModalTrigger>
-                            <ModalBody>
-                                <ModalContent>
-                                    <div className="flex justify-center items-center">
-                                        <div className="w-full m-auto max-w-md p-8 bg-gray-700 rounded-lg shadow-lg">
-                                            <h2 className="mb-6 text-3xl font-extrabold text-center text-white">Create New Project</h2>
-                                            {error && (
-                                                <div className="mb-4 w-full bg-red-700/20 py-3 rounded-lg border border-red-500 text-sm text-center text-red-500">
-                                                    {error}
-                                                </div>
-                                            )}
-                                            <form onSubmit={handleSubmit}>
-                                                <div className="relative mb-4">
-                                                    <input
-                                                        onChange={(e) => setName(e.target.value)}
-                                                        value={name}
-                                                        type="text"
-                                                        placeholder="Enter your project name"
-                                                        className="w-full px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                        required
-                                                    />
-                                                </div>
-                                                <div className="relative mb-4 opacity-80">
-                                                    <input
-                                                        onChange={(e) => setUid(e.target.value)}
-                                                        value={uid}
-                                                        type="text"
-                                                        disabled
-                                                        className="w-full cursor-not-allowed px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                        required
-                                                    />
-                                                </div>
-                                                <button
-                                                    type="submit"
-                                                    disabled={isLoading}
-                                                    className={`w-full px-4 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-4 ${isLoading
-                                                        ? "bg-blue-400 cursor-not-allowed"
-                                                        : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
-                                                        }`}>
-                                                    {isLoading ? "Processing..." : "Start Chat"}
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </ModalContent>
-                            </ModalBody>
-                        </Modal>
+                </ul>
+            )}
+            {/* Modal for Adding Users */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="modal-title"
+                >
+                    <div className="bg-gray-700 rounded-lg shadow-lg w-full max-w-md p-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 id="modal-title" className="text-xl font-semibold">
+                                Add User
+                            </h2>
+                            <button
+                                onClick={handleClose}
+                                aria-label="Close modal"
+                                className="text-white hover:text-gray-400"
+                            >
+                                <IoMdClose />
+                            </button>
+                        </div>
+                        {error && (
+                            <div className="mb-4 w-full bg-red-700/20 py-3 rounded-lg border border-red-500 text-sm text-center text-red-500">
+                                {error}
+                            </div>
+                        )}
+                        <form onSubmit={handleUserSubmit}>
+                            <div className="relative mb-4">
+                                <input
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    value={email}
+                                    type="email"
+                                    placeholder="Enter your e-mail"
+                                    className="w-full px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
+                                />
+                            </div>
+                            <div className="relative mb-4 opacity-80">
+                                <input
+                                    value={pid}
+                                    type="text"
+                                    disabled
+                                    className="w-full cursor-not-allowed px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className={`w-full px-4 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-4 ${isLoading
+                                    ? "bg-blue-400 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+                                    }`}>
+                                {isLoading ? "Processing..." : "Add"}
+                            </button>
+                        </form>
                     </div>
-                </ul>)}
+                </div>
+            )}
+            {/* Modal for New Project */}
+            <ModalTrigger className="bg-gray-700 text-white flex justify-center hover:bg-gray-600 cursor-pointer">
+                <span>New Project</span>
+            </ModalTrigger>
+            <ModalBody>
+                <ModalContent>
+                    <div className="flex justify-center items-center">
+                        <div className="w-full m-auto max-w-md p-8 bg-gray-700 rounded-lg shadow-lg">
+                            <h2 className="mb-6 text-3xl font-extrabold text-center text-white">Create New Project</h2>
+                            {error && (
+                                <div className="mb-4 w-full bg-red-700/20 py-3 rounded-lg border border-red-500 text-sm text-center text-red-500">
+                                    {error}
+                                </div>
+                            )}
+                            <form onSubmit={handleCreateProject}>
+                                <div className="relative mb-4">
+                                    <input
+                                        onChange={(e) => setNewProjectName(e.target.value)}
+                                        value={newProjectName}
+                                        type="text"
+                                        placeholder="Enter your project name"
+                                        className="w-full px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div className="relative mb-4 opacity-80">
+                                    <input
+                                        value={user._id}
+                                        type="text"
+                                        disabled
+                                        className="w-full cursor-not-allowed px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className={`w-full px-4 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-4 ${isLoading
+                                        ? "bg-blue-400 cursor-not-allowed"
+                                        : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+                                        }`}>
+                                    {isLoading ? "Processing..." : "Start Chat"}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </ModalContent>
+            </ModalBody>
+            {alert && (
+                <Alert
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={() => setAlert(null)}
+                />
+            )}
         </div>
     );
 };
