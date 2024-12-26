@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Link } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
+import { RiMore2Fill } from "react-icons/ri";
 import { CiUser } from "react-icons/ci";
-import { IoMdClose } from "react-icons/io";
-import { MdDelete } from "react-icons/md";
+import { IoMdClose } from "react-icons/io"
 import { ModalBody, ModalContent, ModalTrigger } from "./AnimatedModal";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -23,11 +22,14 @@ const ChatList = () => {
     const { user } = useSelector((state) => state.user);
     const token = localStorage.getItem("token");
     const [alert, setAlert] = useState(null);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Toggle for profile dropdown
     const [selectedChat, setSelectedChat] = useState(null); // To manage selected chat
     const showAlert = (message, type) => {
         setAlert({ message, type });
     };
-
+    const handleDropdownToggle = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    };
     const handleCloseChat = () => {
         setSelectedChat(null); // Deselect chat
     };
@@ -157,23 +159,6 @@ const ChatList = () => {
                                         <CiUser /> Collaborators: {chat.users.length}
                                     </p>
                                 </Link>
-                                <div className="flex items-center mt-2 sm:mt-0">
-                                    <button
-                                        className="bg-gray-800 p-2 mr-1 rounded-full"
-                                        onClick={() => {
-                                            setIsOpen(true);
-                                            setPid(chat._id);
-                                        }}
-                                    >
-                                        <FaPlus />
-                                    </button>
-                                    <button
-                                        className="bg-gray-800 p-2 ml-1 rounded-full"
-                                        onClick={() => handleDelete(chat._id)}
-                                    >
-                                        <MdDelete />
-                                    </button>
-                                </div>
                             </li>
                         ))}
                     </ul>
@@ -303,11 +288,8 @@ const ChatList = () => {
                 {selectedChat ? (
                     <div className="flex flex-col h-full">
                         {/* Sticky Header */}
-                        <div className="flex items-center bg-blue-500 text-white p-4 sticky top-20 z-10">
-                            <button
-                                className="mr-4"
-                                onClick={handleCloseChat}
-                            >
+                        <div className="flex items-center bg-blue-500 text-white p-4 sticky top-20">
+                            <button className="mr-4" onClick={handleCloseChat}>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-5 w-5"
@@ -322,7 +304,22 @@ const ChatList = () => {
                                 </svg>
                             </button>
                             <h2 className="text-lg font-semibold">{selectedChat.projectName}</h2>
+                            <div className="relative ml-auto">
+                                <button onClick={handleDropdownToggle} className="focus:outline-none bg-blue-500 p-2 rounded-full">
+                                    <RiMore2Fill scale={2} />
+                                </button>
+                                {isDropdownOpen && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg overflow-hidden">
+                                        <button className="block px-4 py-2 w-full text-left hover:bg-blue-200 hover:text-blue-500 font-semibold" onClick={() => {
+                                            setIsOpen(true);
+                                            setPid(selectedChat._id);
+                                        }}>Add User</button>
+                                        <button className="block px-4 py-2 w-full text-left hover:bg-red-200 hover:text-red-500 font-semibold" onClick={() => handleDelete(selectedChat._id)}>Delete Project</button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
+
                         <ChatWindow project={selectedChat} />
                     </div>
                 ) : (
