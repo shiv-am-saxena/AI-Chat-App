@@ -24,14 +24,19 @@ const ChatList = () => {
     const [alert, setAlert] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Toggle for profile dropdown
     const [selectedChat, setSelectedChat] = useState(null); // To manage selected chat
+    const [isOverlayOpen, setIsOverlayOpen] = useState(false);
     const showAlert = (message, type) => {
         setAlert({ message, type });
     };
     const handleDropdownToggle = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
+    const handleOverlayToggle = () => {
+        setIsOverlayOpen(!isOverlayOpen);
+    }
     const handleCloseChat = () => {
         setSelectedChat(null); // Deselect chat
+        handleOverlayToggle();
     };
 
     const handleClose = () => {
@@ -90,6 +95,7 @@ const ChatList = () => {
             const res = await response.data;
             showAlert(res.message, 'success');
             setChats((prev) => prev.filter((chat) => chat._id !== id));
+            setSelectedChat(null);
         } catch (err) {
             setError(err.response?.data?.message || "Something went wrong");
         }
@@ -119,7 +125,7 @@ const ChatList = () => {
             {/* Sidebar: Project List */}
             <div
                 className={`${selectedChat ? "hidden sm:flex" : "flex"
-                    } flex-col xl:w-1/4 lg:w-1/3 sm:w-1/2 w-full bg-gray-800 p-4`}
+                    } flex-col md:w-1/4 sm:w-1/3 w-full bg-gray-800 p-4`}
             >
                 <Link
                     to="/"
@@ -288,7 +294,7 @@ const ChatList = () => {
                 {selectedChat ? (
                     <div className="flex flex-col h-full">
                         {/* Sticky Header */}
-                        <div className="flex items-center bg-blue-500 text-white p-4 sticky top-20">
+                        <div className="flex items-center bg-blue-500 text-white px-4 sticky z-[3] top-20">
                             <button className="mr-4" onClick={handleCloseChat}>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -303,7 +309,7 @@ const ChatList = () => {
                                     />
                                 </svg>
                             </button>
-                            <h2 className="text-lg font-semibold">{selectedChat.projectName}</h2>
+                            <h2 className="text-lg w-full p-4 h-full font-semibold" onClick={handleOverlayToggle}>{selectedChat.projectName}</h2>
                             <div className="relative ml-auto">
                                 <button onClick={handleDropdownToggle} className="focus:outline-none bg-blue-500 p-2 rounded-full">
                                     <RiMore2Fill scale={2} />
@@ -313,14 +319,17 @@ const ChatList = () => {
                                         <button className="block px-4 py-2 w-full text-left hover:bg-blue-200 hover:text-blue-500 font-semibold" onClick={() => {
                                             setIsOpen(true);
                                             setPid(selectedChat._id);
-                                        }}>Add User</button>
+                                        }}>Add Collaborator</button>
                                         <button className="block px-4 py-2 w-full text-left hover:bg-red-200 hover:text-red-500 font-semibold" onClick={() => handleDelete(selectedChat._id)}>Delete Project</button>
                                     </div>
                                 )}
                             </div>
                         </div>
-
-                        <ChatWindow project={selectedChat} />
+                        <div className="relative h-full">
+                            <div className={`h-full w-full  bg-green-500 absolute transition-all z-[2] duration-500 ${isOverlayOpen ? 'top-0' : '-top-[110%] '}`}>
+                            </div>
+                            <ChatWindow project={selectedChat} />
+                        </div>
                     </div>
                 ) : (
                     <div className="h-full flex items-center justify-center">
@@ -330,7 +339,6 @@ const ChatList = () => {
                     </div>
                 )}
             </div>
-
         </div>
     );
 };
