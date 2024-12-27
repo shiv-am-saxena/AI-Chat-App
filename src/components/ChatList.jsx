@@ -175,7 +175,7 @@ const ChatList = () => {
 
     // Fetch chat details for a specific project
     const fetchChat = async (id) => {
-        dispatch(setLoading()); // Set loading state
+        dispatch(setLoading({ isLoading: true })); // Set loading state
         try {
             const response = await axios.get(`/chat/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -185,6 +185,7 @@ const ChatList = () => {
         } catch (err) {
             showAlert(err.response?.data?.message || "Something went wrong", 'error');
         }
+
     };
 
     // Fetch projects and users when the component mounts
@@ -389,8 +390,8 @@ const ChatList = () => {
                                 )}
                             </div>
                         </div>
-                        <div className="relative h-full">
-                            <div className={`h-full p-5 w-full  bg-gray-700 absolute flex items-center justify-center transition-all z-[2] duration-500 ${isOverlayOpen ? 'translate-y-0' : '-translate-y-full '}`}>
+                        <div className="h-full relative w-full">
+                            <div className={`max-h-[93%] h-full w-full p-5 bg-gray-700 absolute flex items-center justify-center transition-all z-[1] duration-500 ${isOverlayOpen ? 'translate-y-0' : '-translate-y-full '}`}>
                                 <div className="max-w-md w-full flex flex-nowrap flex-col items-center justify-around p-3 h-full ">
                                     <div className="flex items-center justify-center w-full flex-col gap-5 flex-nowrap max-h-40 h-fit">
                                         <div className=" rounded-full flex items-center justify-center overflow-hidden p-3 bg-gray-500">
@@ -412,7 +413,7 @@ const ChatList = () => {
                                     </div>
                                 </div>
                             </div>
-                            <ChatWindow project={selectedChat} />
+                            <div className="max-h-[84.2%] h-full"> <ChatWindow project={selectedChat} /></div>
                         </div>
                     </div>
                 ) : (

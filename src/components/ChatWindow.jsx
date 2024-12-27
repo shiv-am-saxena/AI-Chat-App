@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect, useRef } from "react";
 import { IoSend } from "react-icons/io5";
 import { recieveMessage, sendMessages } from "../config/socket";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,10 +14,27 @@ const ChatWindow = ({ project }) => {
     const [newMessage, setNewMessage] = useState("");
     const [alert, setAlert] = useState(null);
     const token = localStorage.getItem('token');
+    const messagesEndRef = useRef(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    // Scroll to bottom when chats are updated
+    useLayoutEffect(() => {
+        if (!isLoading) {
+            scrollToBottom();
+        }
+    }, [chats, isLoading]);  // Ensures it scrolls whenever the 'chats' state changes
+
+    // useEffect(() => {
+    //     scrollToBottom(); // Scroll to bottom when the chat window first opens
+    // }, []);  // Empty dependency array means this runs only once when the component is mounted
 
     const showAlert = (message, type) => {
         setAlert({ message, type });
     };
+
     const send = (e) => {
         e.preventDefault();
         if (newMessage.trim()) {
@@ -33,29 +50,31 @@ const ChatWindow = ({ project }) => {
         }
         setNewMessage('');
     };
+
     useEffect(() => {
         if (token) {
             recieveMessage('project-message', (data) => {
                 dispatch(addChat(data));
             })
         }
-        if(error){
+        if (error) {
             showAlert(error, 'error');
             setTimeout(() => {
                 dispatch(setError(null));
             }, 5000);
         }
-    },[])
+    }, [dispatch, token, error]);
+
     return (
         isLoading ? (
-            <div className="flex items-center justify-center h-full" >
+            <div className="flex items-center justify-center h-full">
                 <h1>Loading...</h1>
-            </div >
+            </div>
         ) : (
-            <div className="flex flex-col h-full relative">
+            <div className="relative h-full z-[0}">
 
                 {/* Messages */}
-                <div className="max-h-[100%] h-full relative overflow-y-auto p-4 space-y-4 bg-white">
+                <div className="h-full relative overflow-y-auto p-4 space-y-4 bg-white">
                     {chats.map((msg) => (
                         <div
                             key={msg.id}
@@ -72,11 +91,12 @@ const ChatWindow = ({ project }) => {
                             </div>
                         </div>
                     ))}
+                    <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input Field */}
-                <div className="p-4 relative bg-gray-200 shadow-lg">
-                    <form onSubmit={send} className="sticky bottom-0 flex gap-2 items-center">
+                <div className="p-4 bg-gray-200 shadow-lg">
+                    <form onSubmit={send} className="flex gap-2 items-center">
                         <input
                             type="text"
                             placeholder="Type your message..."
@@ -92,6 +112,7 @@ const ChatWindow = ({ project }) => {
                         </button>
                     </form>
                 </div>
+
                 {alert && (
                     <Alert
                         message={alert.message}
@@ -99,7 +120,8 @@ const ChatWindow = ({ project }) => {
                         onClose={() => setAlert(null)}
                     />
                 )}
-            </div>)
+            </div>
+        )
     );
 };
 
