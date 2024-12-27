@@ -15,7 +15,7 @@ const Home = () => {
     const pathLengthFifth = progress;
 
     return (
-        <div className="relative h-[calc(100vh-136px)] py-10 w-full flex items-center justify-center">
+        <div className="relative min-h-screen py-10 w-full flex items-center justify-center">
             <GoogleGeminiEffect
                 pathLengths={[
                     pathLengthFirst,

@@ -71,10 +71,10 @@ const ChatWindow = ({ project }) => {
                 <h1>Loading...</h1>
             </div>
         ) : (
-            <div className="relative h-full z-[0}">
+            <div className="relative h-full w-full z-[0]">
 
                 {/* Messages */}
-                <div className="h-full relative overflow-y-auto p-4 space-y-4 bg-white">
+                <div className="h-[calc(100%-80px)] relative overflow-y-auto p-4 space-y-4 bg-white">
                     {chats.map((msg) => (
                         <div
                             key={msg.id}
@@ -95,8 +95,8 @@ const ChatWindow = ({ project }) => {
                 </div>
 
                 {/* Input Field */}
-                <div className="p-4 bg-gray-200 shadow-lg">
-                    <form onSubmit={send} className="flex gap-2 items-center">
+                <div className="h-20 p-4 bg-gray-200 shadow-lg">
+                    <form onSubmit={send} className="flex gap-2 items-center h-full">
                         <input
                             type="text"
                             placeholder="Type your message..."

@@ -197,11 +197,11 @@ const ChatList = () => {
     }, [token]);
 
     return (
-        <div className="h-full w-full flex">
+        <div className="h-full w-full flex flex-col sm:flex-row">
             {/* Sidebar: Project List */}
             <div
                 className={`${selectedChat ? "hidden sm:flex" : "flex"
-                    } flex-col md:w-1/4 sm:w-1/3 w-full bg-gray-800 p-4`}
+                    } flex-col md:w-1/4 sm:w-1/3 w-full bg-gray-800 p-4 h-full`}
             >
                 {/* Back Link */}
                 <Link
@@ -273,7 +273,7 @@ const ChatList = () => {
                                 </button>
                             </div>
                             <form onSubmit={handleUserSubmit}>
-                                <div className="relative mb-4 max-h-96">
+                                <div className="relative mb-4 max-h-96 overflow-y-auto">
                                     {allUsers.map((user, index) => (
                                         <div key={index} className={`w-full mb-2 px-4 py-3 text-white placeholder-gray-400 bg-gray-800 ${selectedUsers.indexOf(user._id) != -1 ? 'bg-gray-600' : ''} hover:bg-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`} onClick={() => selectUsers(user._id)}>
                                             <p className="w-full flex items-center gap-2"><FaUserCircle className="text-4xl text-gray-300 mr-2" />{user.fullName}</p>
@@ -294,7 +294,7 @@ const ChatList = () => {
                     </div>
                 )}
                 {/* New Project Modal Trigger */}
-                <ModalTrigger className="bg-gray-700 text-white flex justify-center hover:bg-gray-600 cursor-pointer">
+                <ModalTrigger className="bg-gray-700 text-white flex justify-center hover:bg-gray-600 cursor-pointer mt-4">
                     <span>New Project</span>
                 </ModalTrigger>
                 <ModalBody>
@@ -354,12 +354,12 @@ const ChatList = () => {
             {/* Main Content: Chat Window */}
             <div
                 className={`${selectedChat ? "flex" : "hidden sm:flex"
-                    } flex-1 flex-col bg-gray-100`}
+                    } flex-1 flex-col bg-gray-100 h-full`}
             >
                 {selectedChat ? (
                     <div className="flex flex-col h-full">
                         {/* Sticky Header */}
-                        <div className="flex items-center bg-blue-500 text-white px-4 sticky z-[3] top-20">
+                        <div className="flex items-center bg-blue-500 text-white px-4 sticky z-[3] top-0 w-full">
                             <button className="mr-4" onClick={handleCloseChat}>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -390,8 +390,8 @@ const ChatList = () => {
                                 )}
                             </div>
                         </div>
-                        <div className="h-full relative w-full">
-                            <div className={`max-h-[93%] h-full w-full p-5 bg-gray-700 absolute flex items-center justify-center transition-all z-[1] duration-500 ${isOverlayOpen ? 'translate-y-0' : '-translate-y-full '}`}>
+                        <div className="max-h-[93.5%] relative w-full">
+                            <div className={`h-full w-full p-5 bg-gray-700 absolute flex items-center justify-center transition-all z-[1] duration-500 ${isOverlayOpen ? 'translate-y-0' : '-translate-y-full '}`}>
                                 <div className="max-w-md w-full flex flex-nowrap flex-col items-center justify-around p-3 h-full ">
                                     <div className="flex items-center justify-center w-full flex-col gap-5 flex-nowrap max-h-40 h-fit">
                                         <div className=" rounded-full flex items-center justify-center overflow-hidden p-3 bg-gray-500">
@@ -413,7 +413,7 @@ const ChatList = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="max-h-[84.2%] h-full"> <ChatWindow project={selectedChat} /></div>
+                            <div className="h-full"> <ChatWindow project={selectedChat} /></div>
                         </div>
                     </div>
                 ) : (
