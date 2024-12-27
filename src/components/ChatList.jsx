@@ -10,6 +10,9 @@ import axios from "../config/axios.js";
 import { useModal } from "./AnimatedModal";
 import Alert from './Alert.jsx';
 import ChatWindow from "./ChatWindow.jsx";
+import { FaUserCircle } from "react-icons/fa";
+import { HiMiniUserGroup } from "react-icons/hi2";
+
 const ChatList = () => {
     const { setOpen } = useModal();
     const [chats, setChats] = useState([]);
@@ -17,7 +20,6 @@ const ChatList = () => {
     const [error, setError] = useState(null);
     const [newProjectName, setNewProjectName] = useState("");
     const [isOpen, setIsOpen] = useState(false);
-    const [email, setEmail] = useState("");
     const [pid, setPid] = useState("");
     const { user } = useSelector((state) => state.user);
     const token = localStorage.getItem("token");
@@ -25,6 +27,8 @@ const ChatList = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Toggle for profile dropdown
     const [selectedChat, setSelectedChat] = useState(null); // To manage selected chat
     const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+    const [allUsers, setAllUsers] = useState([]);
+    const [selectedUsers, setSelectedUsers] = useState([]);
     const showAlert = (message, type) => {
         setAlert({ message, type });
     };
@@ -41,7 +45,7 @@ const ChatList = () => {
 
     const handleClose = () => {
         setIsOpen(false);
-        setEmail("");
+        setSelectedUsers([]);
         setPid("");
     };
 
@@ -51,19 +55,34 @@ const ChatList = () => {
         try {
             const response = await axios.put(
                 "/project/addUser",
-                { email, pid },
+                { id: selectedUsers, pid },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             const res = await response.data;
             showAlert(res.message, 'success');
             handleClose();
         } catch (err) {
-            setError(err.response?.data?.message || "Something went wrong");
+            console.log(err)
+            setError(err.response?.data?.data?.message || "Something went wrong");
+            showAlert(error, "error");
         } finally {
             setIsLoading(false);
+            setTimeout(() => {
+                setError(null);
+            }, 5000);
         }
     };
-
+    const selectUsers = (id) => {
+        setSelectedUsers((prevSelectedUsers) => {
+            const updatedUsers = new Set(prevSelectedUsers);
+            if (updatedUsers.has(id)) {
+                updatedUsers.delete(id);
+            } else {
+                updatedUsers.add(id);
+            }
+            return Array.from(updatedUsers);
+        });
+    }
     const handleCreateProject = async (e) => {
         e.preventDefault();
         setError(null);
@@ -115,9 +134,25 @@ const ChatList = () => {
             setIsLoading(false);
         }
     };
-
+    const fetchUsers = async () => {
+        setError(null);
+        setIsLoading(true);
+        try {
+            const response = await axios.get("/auth/all", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setAllUsers(response.data.data || []);
+        } catch (err) {
+            setError(err.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
+    };
     useEffect(() => {
-        if (token) fetchProjects();
+        if (token) {
+            fetchProjects();
+            fetchUsers();
+        }
     }, [token]);
 
     return (
@@ -157,7 +192,7 @@ const ChatList = () => {
                             <li
                                 key={chat._id}
                                 className="p-4 mb-2 rounded-lg bg-gray-700 flex items-center justify-between cursor-pointer"
-                                onClick={() => setSelectedChat(chat)} // Set the selected chat
+                                onClick={() => { setSelectedChat(chat); isOverlayOpen ? handleOverlayToggle() : '' }} // Set the selected chat
                             >
                                 <Link to="#" className="w-full">
                                     <p className="font-bold text-lg text-white">{chat.projectName}</p>
@@ -179,7 +214,7 @@ const ChatList = () => {
                         <div className="bg-gray-700 rounded-lg shadow-lg w-full max-w-md p-6">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 id="modal-title" className="text-xl font-semibold">
-                                    Add User
+                                    Add Collaborators
                                 </h2>
                                 <button
                                     onClick={handleClose}
@@ -189,30 +224,12 @@ const ChatList = () => {
                                     <IoMdClose />
                                 </button>
                             </div>
-                            {error && (
-                                <div className="mb-4 w-full bg-red-700/20 py-3 rounded-lg border border-red-500 text-sm text-center text-red-500">
-                                    {error}
-                                </div>
-                            )}
                             <form onSubmit={handleUserSubmit}>
-                                <div className="relative mb-4">
-                                    <input
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        value={email}
-                                        type="email"
-                                        placeholder="Enter your e-mail"
-                                        className="w-full px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        required
-                                    />
-                                </div>
-                                <div className="relative mb-4 opacity-80">
-                                    <input
-                                        value={pid}
-                                        type="text"
-                                        disabled
-                                        className="w-full cursor-not-allowed px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        required
-                                    />
+                                <div className="relative mb-4 max-h-96">
+                                    {allUsers.map((user, index) => (
+                                        <div key={index} className={`w-full mb-2 px-4 py-3 text-white placeholder-gray-400 bg-gray-800 ${selectedUsers.indexOf(user._id) != -1 ? 'bg-gray-600' : ''} hover:bg-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`} onClick={() => selectUsers(user._id)}>
+                                            <p className="w-full flex items-center gap-2"><FaUserCircle className="text-4xl text-gray-300 mr-2" />{user.fullName}</p>
+                                        </div>))}
                                 </div>
                                 <button
                                     type="submit"
@@ -326,7 +343,27 @@ const ChatList = () => {
                             </div>
                         </div>
                         <div className="relative h-full">
-                            <div className={`h-full w-full  bg-green-500 absolute transition-all z-[2] duration-500 ${isOverlayOpen ? 'top-0' : '-top-[110%] '}`}>
+                            <div className={`h-full p-5 w-full  bg-gray-700 absolute flex items-center justify-center transition-all z-[2] duration-500 ${isOverlayOpen ? 'translate-y-0' : '-translate-y-full '}`}>
+                                <div className="max-w-md w-full flex flex-nowrap flex-col items-center justify-around p-3 h-full ">
+                                    <div className="flex items-center justify-center w-full flex-col gap-5 flex-nowrap max-h-40 h-fit">
+                                        <div className=" rounded-full flex items-center justify-center overflow-hidden p-3 bg-gray-500">
+                                            <HiMiniUserGroup className="h-10 w-10"/>
+                                        </div>
+                                        <h2 className="flex items-center justify-center w-full text-center mb-2 text-4xl">
+                                            {selectedChat.projectName}
+                                        </h2>
+                                    </div>
+                                    <div className="relative max-w-xs w-full rounded-xl p-5 shadow-neumorph">
+                                        <h2 className="w-full text-center mb-2 text-2xl">Collaborators</h2>
+                                        <div className="flex flex-nowrap max-h-96 gap-3 flex-col overflow-y-auto">
+                                            {selectedChat.users.map((user, index) => (
+                                                <div key={index} className={`w-full  px-4 py-3 text-white bg-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}>
+                                                    <p className="w-full flex items-center gap-2"><FaUserCircle className="text-4xl text-gray-300 mr-2" />{user.fullName}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <ChatWindow project={selectedChat} />
                         </div>

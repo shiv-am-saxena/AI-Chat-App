@@ -10,6 +10,9 @@ export default {
         montserrat: ["Montserrat", "sans-serif"],
         pristina: ["Pristina", "sans-serif"],
       },
+      boxShadow: {
+        neumorph: `20px 20px 60px #2f3745, -20px -20px 60px #3f4b5d`,
+      }
     },
   },
   plugins: [],
