@@ -6,6 +6,7 @@ import { removeUser, setLoading, setError } from "../context/slices/userState";
 import { FaUserCircle } from "react-icons/fa";
 import { FiChevronDown, FiLogOut, FiSettings, FiUser } from "react-icons/fi";
 import axios from "../config/axios";
+import { disconnectSocket } from "../config/socket";
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false); // Toggle for the mobile menu
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Toggle for profile dropdown
@@ -30,6 +31,7 @@ export default function Navbar() {
         dispatch(setLoading());
         const token = localStorage.getItem('token');
         try {
+            disconnectSocket();
             const response = await axios.get('/auth/logout', {
                 headers: {
                     Authorization: `Bearer ${token}`,

@@ -2,53 +2,70 @@
 import { Link } from "react-router-dom";
 import { RiMore2Fill } from "react-icons/ri";
 import { CiUser } from "react-icons/ci";
-import { IoMdClose } from "react-icons/io"
+import { IoMdClose } from "react-icons/io";
 import { ModalBody, ModalContent, ModalTrigger } from "./AnimatedModal";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "../config/axios.js";
 import { useModal } from "./AnimatedModal";
 import Alert from './Alert.jsx';
 import ChatWindow from "./ChatWindow.jsx";
 import { FaUserCircle } from "react-icons/fa";
 import { HiMiniUserGroup } from "react-icons/hi2";
+import { disconnectSocket, initializeSocket } from "../config/socket.js";
+import { setChats, setLoading } from "../context/slices/chats/index.js";
 
 const ChatList = () => {
-    const { setOpen } = useModal();
-    const [chats, setChats] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [newProjectName, setNewProjectName] = useState("");
-    const [isOpen, setIsOpen] = useState(false);
-    const [pid, setPid] = useState("");
-    const { user } = useSelector((state) => state.user);
-    const token = localStorage.getItem("token");
-    const [alert, setAlert] = useState(null);
+    // state management
+    const [chats, setChat] = useState([]); // List of chats (projects)
+    const [isLoading, setIsLoading] = useState(false); // Loading state
+    const [error, setError] = useState(null); // Error state
+    const [newProjectName, setNewProjectName] = useState(""); // Input for new project name
+    const [isOpen, setIsOpen] = useState(false); // Modal open state
+    const [pid, setPid] = useState(""); // Selected project ID for actions
+    const [alert, setAlert] = useState(null); // Alert message
+    const [selectedUsers, setSelectedUsers] = useState([]); // Selected users for adding to a project
+    const [allUsers, setAllUsers] = useState([]); // List of all users for adding collaborators
+    const [isOverlayOpen, setIsOverlayOpen] = useState(false); // Overlay toggle state
+    const [selectedChat, setSelectedChat] = useState(null); // Currently selected chat/project
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Toggle for profile dropdown
-    const [selectedChat, setSelectedChat] = useState(null); // To manage selected chat
-    const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-    const [allUsers, setAllUsers] = useState([]);
-    const [selectedUsers, setSelectedUsers] = useState([]);
+
+    // redux or hooks
+    const { setOpen } = useModal();
+    const { user } = useSelector((state) => state.user); // User information from Redux store
+    const dispatch = useDispatch(); // Redux dispatch function
+    // localStorage
+    const token = localStorage.getItem("token"); // Token from localStorage
+    // Function to show alerts
     const showAlert = (message, type) => {
         setAlert({ message, type });
     };
+
+    // Toggle dropdown visibility
     const handleDropdownToggle = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
+
+    // Toggle overlay visibility
     const handleOverlayToggle = () => {
         setIsOverlayOpen(!isOverlayOpen);
-    }
+    };
+
+    // Close chat window and disconnect socket
     const handleCloseChat = () => {
         setSelectedChat(null); // Deselect chat
         handleOverlayToggle();
+        disconnectSocket();
     };
 
+    // Close modal and reset state
     const handleClose = () => {
         setIsOpen(false);
         setSelectedUsers([]);
         setPid("");
     };
 
+    // Add selected users to a project
     const handleUserSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -62,7 +79,6 @@ const ChatList = () => {
             showAlert(res.message, 'success');
             handleClose();
         } catch (err) {
-            console.log(err)
             setError(err.response?.data?.data?.message || "Something went wrong");
             showAlert(error, "error");
         } finally {
@@ -72,6 +88,8 @@ const ChatList = () => {
             }, 5000);
         }
     };
+
+    // Select or deselect a user for collaboration
     const selectUsers = (id) => {
         setSelectedUsers((prevSelectedUsers) => {
             const updatedUsers = new Set(prevSelectedUsers);
@@ -82,7 +100,9 @@ const ChatList = () => {
             }
             return Array.from(updatedUsers);
         });
-    }
+    };
+
+    // Create a new project
     const handleCreateProject = async (e) => {
         e.preventDefault();
         setError(null);
@@ -94,7 +114,7 @@ const ChatList = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             const res = await response.data;
-            setChats((prev) => [...prev, response.data.data]);
+            setChat((prev) => [...prev, response.data.data]);
             setOpen(false);
             setNewProjectName("");
             showAlert(res.message, "success");
@@ -105,6 +125,7 @@ const ChatList = () => {
         }
     };
 
+    // Delete a project
     const handleDelete = async (id) => {
         setError(null);
         try {
@@ -113,13 +134,14 @@ const ChatList = () => {
             });
             const res = await response.data;
             showAlert(res.message, 'success');
-            setChats((prev) => prev.filter((chat) => chat._id !== id));
+            setChat((prev) => prev.filter((chat) => chat._id !== id));
             setSelectedChat(null);
         } catch (err) {
             setError(err.response?.data?.message || "Something went wrong");
         }
     };
 
+    // Fetch all projects
     const fetchProjects = async () => {
         setError(null);
         setIsLoading(true);
@@ -127,13 +149,15 @@ const ChatList = () => {
             const response = await axios.get("/project/all", {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setChats(response.data.data || []);
+            setChat(response.data.data || []);
         } catch (err) {
             setError(err.response?.data?.message || "Something went wrong");
         } finally {
             setIsLoading(false);
         }
     };
+
+    // Fetch all users
     const fetchUsers = async () => {
         setError(null);
         setIsLoading(true);
@@ -148,6 +172,22 @@ const ChatList = () => {
             setIsLoading(false);
         }
     };
+
+    // Fetch chat details for a specific project
+    const fetchChat = async (id) => {
+        dispatch(setLoading()); // Set loading state
+        try {
+            const response = await axios.get(`/chat/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const res = await response.data;
+            dispatch(setChats(res.data));
+        } catch (err) {
+            showAlert(err.response?.data?.message || "Something went wrong", 'error');
+        }
+    };
+
+    // Fetch projects and users when the component mounts
     useEffect(() => {
         if (token) {
             fetchProjects();
@@ -162,6 +202,7 @@ const ChatList = () => {
                 className={`${selectedChat ? "hidden sm:flex" : "flex"
                     } flex-col md:w-1/4 sm:w-1/3 w-full bg-gray-800 p-4`}
             >
+                {/* Back Link */}
                 <Link
                     to="/"
                     className="mb-4 w-fit flex items-center text-gray-300 hover:text-white"
@@ -182,6 +223,7 @@ const ChatList = () => {
                 </Link>
 
                 <h2 className="text-xl font-semibold mb-4 block">Projects</h2>
+                {/* Show loading spinner or project list */}
                 {isLoading ? (
                     <div className="flex items-center justify-center h-full">
                         <h1>Loading...</h1>
@@ -192,7 +234,12 @@ const ChatList = () => {
                             <li
                                 key={chat._id}
                                 className="p-4 mb-2 rounded-lg bg-gray-700 flex items-center justify-between cursor-pointer"
-                                onClick={() => { setSelectedChat(chat); isOverlayOpen ? handleOverlayToggle() : '' }} // Set the selected chat
+                                onClick={() => {
+                                    setSelectedChat(chat);
+                                    isOverlayOpen ? handleOverlayToggle() : '';
+                                    initializeSocket(chat._id);
+                                    fetchChat(chat._id);
+                                }} // Set the selected chat
                             >
                                 <Link to="#" className="w-full">
                                     <p className="font-bold text-lg text-white">{chat.projectName}</p>
@@ -347,7 +394,7 @@ const ChatList = () => {
                                 <div className="max-w-md w-full flex flex-nowrap flex-col items-center justify-around p-3 h-full ">
                                     <div className="flex items-center justify-center w-full flex-col gap-5 flex-nowrap max-h-40 h-fit">
                                         <div className=" rounded-full flex items-center justify-center overflow-hidden p-3 bg-gray-500">
-                                            <HiMiniUserGroup className="h-10 w-10"/>
+                                            <HiMiniUserGroup className="h-10 w-10" />
                                         </div>
                                         <h2 className="flex items-center justify-center w-full text-center mb-2 text-4xl">
                                             {selectedChat.projectName}
