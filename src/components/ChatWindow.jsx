@@ -75,9 +75,9 @@ const ChatWindow = ({ project }) => {
 
                 {/* Messages */}
                 <div className="h-[75vh] md:h-[76vh] relative overflow-y-auto p-4 space-y-4 bg-white">
-                    {chats.map((msg) => (
+                    {chats.map((msg, index) => (
                         <div
-                            key={msg.id}
+                            key={index}
                             className={`flex ${msg.sender === user._id ? "justify-end" : "justify-start"}`}
                         >
                             <div
