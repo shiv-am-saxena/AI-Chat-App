@@ -5,27 +5,50 @@ let socketInstance = null;
 const initializeSocket = (projectId) => {
     socketInstance = socket(import.meta.env.VITE_API_URL, {
         auth: {
-            token: localStorage.getItem('token')
+            token: localStorage.getItem('token'),
         },
         query: {
-            projectId
+            projectId,
+        },
+        transports: ["websocket", "polling"], // Ensure fallback support
+    });
+
+    // Handle connection errors
+    socketInstance.on('connect_error', (error) => {
+        console.error('Socket connection error:', error.message);
+    });
+
+    // Handle disconnection
+    socketInstance.on('disconnect', (reason) => {
+        console.warn('Socket disconnected:', reason);
+        if (reason === 'io server disconnect') {
+            initializeSocket(projectId); // Reconnect if the server disconnects
         }
     });
-}
+};
 
-const recieveMessage = (eventName, cb) => {
-    socketInstance.on(eventName, cb);
-}
+const receiveMessage = (eventName, cb) => {
+    if (socketInstance) {
+        socketInstance.on(eventName, cb);
+    } else {
+        console.error('Socket is not initialized.');
+    }
+};
 
 const sendMessages = (eventName, data) => {
-    socketInstance.emit(eventName, data);
-}
+    if (socketInstance) {
+        socketInstance.emit(eventName, data);
+    } else {
+        console.error('Socket is not initialized.');
+    }
+};
 
 const disconnectSocket = () => {
     if (socketInstance) {
+        socketInstance.removeAllListeners(); // Clean up listeners
         socketInstance.disconnect();
         socketInstance = null;
     }
 };
 
-export { initializeSocket, recieveMessage, sendMessages, disconnectSocket };
+export { initializeSocket, receiveMessage, sendMessages, disconnectSocket };
