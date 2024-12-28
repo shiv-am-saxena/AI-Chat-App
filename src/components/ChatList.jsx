@@ -199,32 +199,16 @@ const ChatList = () => {
     return (
         <div className="h-full w-full flex flex-col sm:flex-row">
             {/* Sidebar: Project List */}
-            <div
-                className={`${selectedChat ? "hidden sm:flex" : "flex"
-                    } flex-col md:w-1/4 sm:w-1/3 w-full bg-gray-800 p-4 h-full`}
-            >
+            <div className={`${selectedChat ? "hidden sm:flex" : "flex"} flex-col md:w-1/4 sm:w-1/3 w-full bg-gray-800 p-4 h-full`}>
                 {/* Back Link */}
-                <Link
-                    to="/"
-                    className="mb-4 w-fit flex items-center text-gray-300 hover:text-white"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-2"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M9.707 4.293a1 1 0 010 1.414L5.414 10l4.293 4.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                        />
+                <Link to="/" className="mb-4 w-fit flex items-center text-gray-300 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9.707 4.293a1 1 0 010 1.414L5.414 10l4.293 4.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                     Back
                 </Link>
 
                 <h2 className="text-xl font-semibold mb-4 block">Projects</h2>
-                {/* Show loading spinner or project list */}
                 {isLoading ? (
                     <div className="flex items-center justify-center h-full">
                         <h1>Loading...</h1>
@@ -232,16 +216,12 @@ const ChatList = () => {
                 ) : (
                     <ul className="flex-1 w-full overflow-y-auto">
                         {chats.map((chat) => (
-                            <li
-                                key={chat._id}
-                                className="p-4 mb-2 rounded-lg bg-gray-700 flex items-center justify-between cursor-pointer"
-                                onClick={() => {
-                                    setSelectedChat(chat);
-                                    isOverlayOpen ? handleOverlayToggle() : '';
-                                    initializeSocket(chat._id);
-                                    fetchChat(chat._id);
-                                }} // Set the selected chat
-                            >
+                            <li key={chat._id} className="p-4 mb-2 rounded-lg bg-gray-700 flex items-center justify-between cursor-pointer" onClick={() => {
+                                setSelectedChat(chat);
+                                isOverlayOpen ? handleOverlayToggle() : '';
+                                initializeSocket(chat._id);
+                                fetchChat(chat._id);
+                            }}>
                                 <Link to="#" className="w-full">
                                     <p className="font-bold text-lg text-white">{chat.projectName}</p>
                                     <p className="flex items-center gap-2 text-sm text-gray-400">
@@ -253,22 +233,11 @@ const ChatList = () => {
                     </ul>
                 )}
                 {isOpen && (
-                    <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="modal-title"
-                    >
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" role="dialog" aria-modal="true" aria-labelledby="modal-title">
                         <div className="bg-gray-700 rounded-lg shadow-lg w-full max-w-md p-6">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 id="modal-title" className="text-xl font-semibold">
-                                    Add Collaborators
-                                </h2>
-                                <button
-                                    onClick={handleClose}
-                                    aria-label="Close modal"
-                                    className="text-white hover:text-gray-400"
-                                >
+                                <h2 id="modal-title" className="text-xl font-semibold">Add Collaborators</h2>
+                                <button onClick={handleClose} aria-label="Close modal" className="text-white hover:text-gray-400">
                                     <IoMdClose />
                                 </button>
                             </div>
@@ -277,23 +246,16 @@ const ChatList = () => {
                                     {allUsers.map((user, index) => (
                                         <div key={index} className={`w-full mb-2 px-4 py-3 text-white placeholder-gray-400 bg-gray-800 ${selectedUsers.indexOf(user._id) != -1 ? 'bg-gray-600' : ''} hover:bg-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`} onClick={() => selectUsers(user._id)}>
                                             <p className="w-full flex items-center gap-2"><FaUserCircle className="text-4xl text-gray-300 mr-2" />{user.fullName}</p>
-                                        </div>))}
+                                        </div>
+                                    ))}
                                 </div>
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className={`w-full px-4 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-4 ${isLoading
-                                        ? "bg-blue-400 cursor-not-allowed"
-                                        : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
-                                        }`}
-                                >
+                                <button type="submit" disabled={isLoading} className={`w-full px-4 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-4 ${isLoading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"}`}>
                                     {isLoading ? "Processing..." : "Add"}
                                 </button>
                             </form>
                         </div>
                     </div>
                 )}
-                {/* New Project Modal Trigger */}
                 <ModalTrigger className="bg-gray-700 text-white flex justify-center hover:bg-gray-600 cursor-pointer mt-4">
                     <span>New Project</span>
                 </ModalTrigger>
@@ -309,32 +271,12 @@ const ChatList = () => {
                                 )}
                                 <form onSubmit={handleCreateProject}>
                                     <div className="relative mb-4">
-                                        <input
-                                            onChange={(e) => setNewProjectName(e.target.value)}
-                                            value={newProjectName}
-                                            type="text"
-                                            placeholder="Enter your project name"
-                                            className="w-full px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
-                                        />
+                                        <input onChange={(e) => setNewProjectName(e.target.value)} value={newProjectName} type="text" placeholder="Enter your project name" className="w-full px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                                     </div>
                                     <div className="relative mb-4 opacity-80">
-                                        <input
-                                            value={user._id}
-                                            type="text"
-                                            disabled
-                                            className="w-full cursor-not-allowed px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
-                                        />
+                                        <input value={user._id} type="text" disabled className="w-full cursor-not-allowed px-4 py-3 text-white placeholder-gray-400 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                                     </div>
-                                    <button
-                                        type="submit"
-                                        disabled={isLoading}
-                                        className={`w-full px-4 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-4 ${isLoading
-                                            ? "bg-blue-400 cursor-not-allowed"
-                                            : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
-                                            }`}
-                                    >
+                                    <button type="submit" disabled={isLoading} className={`w-full px-4 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-4 ${isLoading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"}`}>
                                         {isLoading ? "Processing..." : "Start Chat"}
                                     </button>
                                 </form>
@@ -343,35 +285,19 @@ const ChatList = () => {
                     </ModalContent>
                 </ModalBody>
                 {alert && (
-                    <Alert
-                        message={alert.message}
-                        type={alert.type}
-                        onClose={() => setAlert(null)}
-                    />
+                    <Alert message={alert.message} type={alert.type} onClose={() => setAlert(null)} />
                 )}
             </div>
 
             {/* Main Content: Chat Window */}
-            <div
-                className={`${selectedChat ? "flex" : "hidden sm:flex"
-                    } flex-1 flex-col bg-gray-100 h-full`}
-            >
+            <div className={`${selectedChat ? "flex" : "hidden sm:flex"} flex-1 flex-col bg-gray-100 h-full`}>
                 {selectedChat ? (
                     <div className="flex flex-col h-full">
                         {/* Sticky Header */}
-                        <div className="flex items-center bg-blue-500 text-white px-4 sticky z-[3] top-0 w-full">
+                        <div className="flex items-center bg-blue-500 text-white px-4 sticky z-[3] top-20 w-full">
                             <button className="mr-4" onClick={handleCloseChat}>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-5 w-5"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                >
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M9.707 4.293a1 1 0 010 1.414L5.414 10l4.293 4.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 0z"
-                                        clipRule="evenodd"
-                                    />
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M9.707 4.293a1 1 0 010 1.414L5.414 10l4.293 4.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
                             </button>
                             <h2 className="text-lg w-full p-4 h-full font-semibold" onClick={handleOverlayToggle}>{selectedChat.projectName}</h2>
@@ -390,7 +316,7 @@ const ChatList = () => {
                                 )}
                             </div>
                         </div>
-                        <div className="max-h-[93.5%] relative w-full">
+                        <div className="flex-grow relative w-full">
                             <div className={`h-full w-full p-5 bg-gray-700 absolute flex items-center justify-center transition-all z-[1] duration-500 ${isOverlayOpen ? 'translate-y-0' : '-translate-y-full '}`}>
                                 <div className="max-w-md w-full flex flex-nowrap flex-col items-center justify-around p-3 h-full ">
                                     <div className="flex items-center justify-center w-full flex-col gap-5 flex-nowrap max-h-40 h-fit">
