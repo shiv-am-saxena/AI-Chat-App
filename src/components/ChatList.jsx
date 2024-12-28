@@ -232,30 +232,6 @@ const ChatList = () => {
                         ))}
                     </ul>
                 )}
-                {isOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-                        <div className="bg-gray-700 rounded-lg shadow-lg w-full max-w-md p-6">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 id="modal-title" className="text-xl font-semibold">Add Collaborators</h2>
-                                <button onClick={handleClose} aria-label="Close modal" className="text-white hover:text-gray-400">
-                                    <IoMdClose />
-                                </button>
-                            </div>
-                            <form onSubmit={handleUserSubmit}>
-                                <div className="relative mb-4 max-h-96 overflow-y-auto">
-                                    {allUsers.map((user, index) => (
-                                        <div key={index} className={`w-full mb-2 px-4 py-3 text-white placeholder-gray-400 bg-gray-800 ${selectedUsers.indexOf(user._id) != -1 ? 'bg-gray-600' : ''} hover:bg-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`} onClick={() => selectUsers(user._id)}>
-                                            <p className="w-full flex items-center gap-2"><FaUserCircle className="text-4xl text-gray-300 mr-2" />{user.fullName}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                                <button type="submit" disabled={isLoading} className={`w-full px-4 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-4 ${isLoading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"}`}>
-                                    {isLoading ? "Processing..." : "Add"}
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                )}
                 <ModalTrigger className="bg-gray-700 text-white flex justify-center hover:bg-gray-600 cursor-pointer mt-4">
                     <span>New Project</span>
                 </ModalTrigger>
@@ -315,6 +291,31 @@ const ChatList = () => {
                                     </div>
                                 )}
                             </div>
+
+                            {isOpen && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                                    <div className="bg-gray-700 rounded-lg shadow-lg w-full max-w-md p-6">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h2 id="modal-title" className="text-xl font-semibold">Add Collaborators</h2>
+                                            <button onClick={handleClose} aria-label="Close modal" className="text-white hover:text-gray-400">
+                                                <IoMdClose />
+                                            </button>
+                                        </div>
+                                        <form onSubmit={handleUserSubmit}>
+                                            <div className="relative mb-4 max-h-96 overflow-y-auto">
+                                                {allUsers.map((user, index) => (
+                                                    <div key={index} className={`w-full mb-2 px-4 py-3 text-white placeholder-gray-400 bg-gray-800 ${selectedUsers.indexOf(user._id) != -1 ? 'bg-gray-600' : ''} hover:bg-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`} onClick={() => selectUsers(user._id)}>
+                                                        <p className="w-full flex items-center gap-2"><FaUserCircle className="text-4xl text-gray-300 mr-2" />{user.fullName}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <button type="submit" disabled={isLoading} className={`w-full px-4 py-3 font-semibold text-white rounded-lg focus:outline-none focus:ring-4 ${isLoading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"}`}>
+                                                {isLoading ? "Processing..." : "Add"}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         <div className="flex-grow relative w-full">
                             <div className={`h-full w-full p-5 bg-gray-700 absolute flex items-center justify-center transition-all z-[1] duration-500 ${isOverlayOpen ? 'translate-y-0' : '-translate-y-full '}`}>
