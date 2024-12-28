@@ -92,6 +92,13 @@ export default function Navbar() {
                                 }`}
                         ></span>
                     </Link>
+                    <Link to='/projects' className="relative group px-1">
+                        <span>Projects</span>
+                        <span
+                            className={`absolute inset-x-0 bottom-0 h-[1px] bg-white transition-all duration-300 group-hover:opacity-100 ${location.pathname === '/projects' ? "opacity-100" : "opacity-0"
+                                }`}
+                        ></span>
+                    </Link>
                     {isAuthenticated ? (
                         <>
                             <span className="relative group px-1">Welcome, {user?.fullName || "User"}</span>
@@ -151,6 +158,21 @@ export default function Navbar() {
                 className={`-mt-2 flex flex-col items-center bg-[#121212b9] backdrop-blur-lg text-white transition-all duration-300 overflow-hidden ${isOpen ? "max-h-[500px] py-5" : "max-h-0"
                     } md:hidden`}
             >
+                <Link
+                    to='/'
+                    className={`w-full text-center py-2 ${location.pathname === '/' ? "text-white" : "text-gray-400"
+                        }`}
+                    onClick={() => setIsOpen(false)}
+                >
+                    Home
+                </Link><Link
+                    to='/projects'
+                    className={`w-full text-center py-2 ${location.pathname === '/projects' ? "text-white" : "text-gray-400"
+                        }`}
+                    onClick={() => setIsOpen(false)}
+                >
+                    Projects
+                </Link>
                 {isAuthenticated ? (
                     <>
                         <div
