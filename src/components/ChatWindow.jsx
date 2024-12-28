@@ -74,7 +74,7 @@ const ChatWindow = ({ project }) => {
             <div className="relative h-full w-full z-[0]">
 
                 {/* Messages */}
-                <div className="max-h-[72vh] relative overflow-y-auto p-4 space-y-4 bg-white">
+                <div className="max-h-[70vh] relative overflow-y-auto p-4 space-y-4 bg-white">
                     {chats.map((msg) => (
                         <div
                             key={msg.id}
@@ -95,8 +95,8 @@ const ChatWindow = ({ project }) => {
                 </div>
 
                 {/* Input Field */}
-                <div className="h-20 p-4 bg-gray-200 shadow-lg">
-                    <form onSubmit={send} className="flex gap-2 items-center h-full">
+                <div className="h-20 p-4 bg-gray-200">
+                    <div className="flex gap-2 items-center h-full">
                         <input
                             type="text"
                             placeholder="Type your message..."
@@ -110,7 +110,7 @@ const ChatWindow = ({ project }) => {
                         >
                             <IoSend />
                         </button>
-                    </form>
+                    </div>
                 </div>
 
                 {alert && (

@@ -290,7 +290,7 @@ const ChatList = () => {
             </div>
 
             {/* Main Content: Chat Window */}
-            <div className={`${selectedChat ? "flex" : "hidden sm:flex"} flex-1 flex-col bg-gray-100 h-full`}>
+            <div className={`${selectedChat ? "flex" : "hidden sm:flex"} flex-1 flex-col bg-gray-200 h-full`}>
                 {selectedChat ? (
                     <div className="flex flex-col h-full">
                         {/* Sticky Header */}
