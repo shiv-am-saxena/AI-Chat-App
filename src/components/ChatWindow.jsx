@@ -74,7 +74,7 @@ const ChatWindow = ({ project }) => {
             <div className="relative h-full w-full z-[0]">
 
                 {/* Messages */}
-                <div className="max-h-[72dvh] relative overflow-y-auto p-4 space-y-4 bg-white">
+                <div className="max-h-[72vh] relative overflow-y-auto p-4 space-y-4 bg-white">
                     {chats.map((msg) => (
                         <div
                             key={msg.id}
