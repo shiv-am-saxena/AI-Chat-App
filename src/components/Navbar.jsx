@@ -92,15 +92,15 @@ export default function Navbar() {
                                 }`}
                         ></span>
                     </Link>
-                    <Link to='/projects' className="relative group px-1">
-                        <span>Projects</span>
-                        <span
-                            className={`absolute inset-x-0 bottom-0 h-[1px] bg-white transition-all duration-300 group-hover:opacity-100 ${location.pathname === '/projects' ? "opacity-100" : "opacity-0"
-                                }`}
-                        ></span>
-                    </Link>
                     {isAuthenticated ? (
                         <>
+                            <Link to='/projects' className="relative group px-1">
+                                <span>Projects</span>
+                                <span
+                                    className={`absolute inset-x-0 bottom-0 h-[1px] bg-white transition-all duration-300 group-hover:opacity-100 ${location.pathname === '/projects' ? "opacity-100" : "opacity-0"
+                                        }`}
+                                ></span>
+                            </Link>
                             <span className="relative group px-1">Welcome, {user?.fullName || "User"}</span>
                             <div className="relative">
                                 <div
@@ -165,16 +165,17 @@ export default function Navbar() {
                     onClick={() => setIsOpen(false)}
                 >
                     Home
-                </Link><Link
-                    to='/projects'
-                    className={`w-full text-center py-2 ${location.pathname === '/projects' ? "text-white" : "text-gray-400"
-                        }`}
-                    onClick={() => setIsOpen(false)}
-                >
-                    Projects
                 </Link>
                 {isAuthenticated ? (
                     <>
+                        <Link
+                            to='/projects'
+                            className={`w-full text-center py-2 ${location.pathname === '/projects' ? "text-white" : "text-gray-400"
+                                }`}
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Projects
+                        </Link>
                         <div
                             className="flex items-center cursor-pointer text-white"
                             onClick={handleDropdownToggle}
