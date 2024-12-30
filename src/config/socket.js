@@ -13,18 +13,6 @@ const initializeSocket = (projectId) => {
         transports: ["websocket", "polling"], // Ensure fallback support
     });
 
-    // Handle connection errors
-    socketInstance.on('connect_error', (error) => {
-        console.error('Socket connection error:', error.message);
-    });
-
-    // Handle disconnection
-    socketInstance.on('disconnect', (reason) => {
-        console.warn('Socket disconnected:', reason);
-        if (reason === 'io server disconnect') {
-            initializeSocket(projectId); // Reconnect if the server disconnects
-        }
-    });
 };
 
 const receiveMessage = (eventName, cb) => {

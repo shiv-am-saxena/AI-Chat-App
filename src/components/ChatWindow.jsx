@@ -2,11 +2,14 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState, useLayoutEffect, useRef } from "react";
 import { IoSend } from "react-icons/io5";
-import { recieveMessage, sendMessages } from "../config/socket";
+import { receiveMessage, sendMessages } from "../config/socket";
 import { useDispatch, useSelector } from "react-redux";
 import { setError, addChat } from "../context/slices/chats";
 import Alert from "./Alert";
-
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github.css"; // Optional for syntax highlighting
 const ChatWindow = ({ project }) => {
     const user = useSelector(state => state.user.user);
     const { isLoading, error, chats } = useSelector(state => state.chats);
@@ -26,10 +29,6 @@ const ChatWindow = ({ project }) => {
             scrollToBottom();
         }
     }, [chats, isLoading]);  // Ensures it scrolls whenever the 'chats' state changes
-
-    // useEffect(() => {
-    //     scrollToBottom(); // Scroll to bottom when the chat window first opens
-    // }, []);  // Empty dependency array means this runs only once when the component is mounted
 
     const showAlert = (message, type) => {
         setAlert({ message, type });
@@ -51,11 +50,30 @@ const ChatWindow = ({ project }) => {
         setNewMessage('');
     };
 
+    const formatResponse = (response) => {
+        const markdownTag = '```';
+        const isMarkdown = response.includes(markdownTag);
+
+        if (isMarkdown) {
+            const parts = response.split(markdownTag).map((part, index) => {
+                if (index % 2 === 1) {
+                    return <ReactMarkdown className="prose prose-invert max-w-none bg-gray-900 text-gray-200 py-2 px-3 rounded-lg" key={index} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>{part}</ReactMarkdown>;
+                } else {
+                    return <p key={index} className="text-sm">{part}</p>;
+                }
+            });
+            return parts;
+        } else {
+            return <p className="text-sm">{response.trim()}</p>;
+        }
+    };
+
+
     useEffect(() => {
         if (token) {
-            recieveMessage('project-message', (data) => {
+            receiveMessage('project-message', (data) => {
                 dispatch(addChat(data));
-            })
+            });
         }
         if (error) {
             showAlert(error, 'error');
@@ -81,16 +99,17 @@ const ChatWindow = ({ project }) => {
                             className={`flex ${msg.sender === user._id ? "justify-end" : "justify-start"}`}
                         >
                             <div
-                                className={`p-3 rounded-lg max-w-60 sm:max-w-[60%] ${msg.sender === user._id
+                                className={`p-3 message-response rounded-lg max-w-60 sm:max-w-[60%] ${msg.sender === user._id
                                     ? "bg-blue-500 text-white"
                                     : "bg-gray-200 text-black"
                                     }`}
                             >
                                 <p className="text-xs opacity-60">{msg.email}</p>
-                                <p className="text-sm">{msg.message}</p>
+                                {formatResponse(msg.message)}
                             </div>
                         </div>
                     ))}
+
                     <div ref={messagesEndRef} />
                 </div>
 

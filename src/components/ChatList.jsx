@@ -177,7 +177,7 @@ const ChatList = () => {
     const fetchChat = async (id) => {
         dispatch(setLoading({ isLoading: true })); // Set loading state
         try {
-            const response = await axios.get(`/chat/${id}`, {
+            const response = await axios.get(`/chat/get/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const res = await response.data;
