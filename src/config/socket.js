@@ -4,13 +4,14 @@ let socketInstance = null;
 
 const initializeSocket = (projectId) => {
     socketInstance = socket(import.meta.env.SOCKET, {
+        path: '/socket.io/',
+        transports: ['websocket'],
         auth: {
             token: localStorage.getItem('token'),
         },
         query: {
             projectId,
-        },
-        transports: ["websocket", "polling"], // Ensure fallback support
+        }
     });
 
 };
