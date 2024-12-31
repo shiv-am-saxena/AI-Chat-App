@@ -6,10 +6,56 @@ import { receiveMessage, sendMessages } from "../config/socket";
 import { useDispatch, useSelector } from "react-redux";
 import { setError, addChat } from "../context/slices/chats";
 import Alert from "./Alert";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github.css"; // Optional for syntax highlighting
+import Markdown from "markdown-to-jsx";
+import hljs from 'highlight.js/lib/core';
+import 'highlight.js/styles/night-owl.css';
+
+import javascript from 'highlight.js/lib/languages/javascript';
+import typescript from 'highlight.js/lib/languages/typescript';
+import python from 'highlight.js/lib/languages/python';
+import java from 'highlight.js/lib/languages/java';
+import cpp from 'highlight.js/lib/languages/cpp';
+import csharp from 'highlight.js/lib/languages/csharp';
+import ruby from 'highlight.js/lib/languages/ruby';
+import php from 'highlight.js/lib/languages/php';
+import swift from 'highlight.js/lib/languages/swift';
+import kotlin from 'highlight.js/lib/languages/kotlin';
+import go from 'highlight.js/lib/languages/go';
+import rust from 'highlight.js/lib/languages/rust';
+import dart from 'highlight.js/lib/languages/dart';
+import shell from 'highlight.js/lib/languages/shell';
+import html from 'highlight.js/lib/languages/xml'; // 'xml' covers HTML, XML
+import css from 'highlight.js/lib/languages/css';
+import json from 'highlight.js/lib/languages/json';
+import yaml from 'highlight.js/lib/languages/yaml';
+import markdown from 'highlight.js/lib/languages/markdown';
+import sql from 'highlight.js/lib/languages/sql';
+import graphql from 'highlight.js/lib/languages/graphql';
+import bash from 'highlight.js/lib/languages/bash';
+
+// Registering all languages
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('typescript', typescript);
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('java', java);
+hljs.registerLanguage('cpp', cpp);
+hljs.registerLanguage('csharp', csharp);
+hljs.registerLanguage('ruby', ruby);
+hljs.registerLanguage('php', php);
+hljs.registerLanguage('swift', swift);
+hljs.registerLanguage('kotlin', kotlin);
+hljs.registerLanguage('go', go);
+hljs.registerLanguage('rust', rust);
+hljs.registerLanguage('dart', dart);
+hljs.registerLanguage('shell', shell);
+hljs.registerLanguage('html', html);
+hljs.registerLanguage('css', css);
+hljs.registerLanguage('json', json);
+hljs.registerLanguage('yaml', yaml);
+hljs.registerLanguage('markdown', markdown);
+hljs.registerLanguage('sql', sql);
+hljs.registerLanguage('graphql', graphql);
+hljs.registerLanguage('bash', bash);
 const ChatWindow = ({ project }) => {
     const user = useSelector(state => state.user.user);
     const { isLoading, error, chats } = useSelector(state => state.chats);
@@ -18,13 +64,15 @@ const ChatWindow = ({ project }) => {
     const [alert, setAlert] = useState(null);
     const token = localStorage.getItem('token');
     const messagesEndRef = useRef(null);
-
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     // Scroll to bottom when chats are updated
     useLayoutEffect(() => {
+        document.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
         if (!isLoading) {
             scrollToBottom();
         }
@@ -36,7 +84,7 @@ const ChatWindow = ({ project }) => {
 
     const send = (e) => {
         e.preventDefault();
-        if (newMessage.trim()) {
+        if (newMessage) {
             sendMessages('project-message', {
                 message: newMessage,
                 sender: user._id
@@ -57,14 +105,14 @@ const ChatWindow = ({ project }) => {
         if (isMarkdown) {
             const parts = response.split(markdownTag).map((part, index) => {
                 if (index % 2 === 1) {
-                    return <ReactMarkdown className="prose prose-invert max-w-none bg-gray-900 text-gray-200 py-2 px-3 rounded-lg" key={index} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>{part}</ReactMarkdown>;
+                    return <pre className="prose prose-invert w-full my-2 rounded-lg max-w-full overflow-x-auto" key={index} ><code className={` w-full max-w-full`}>{part}</code></pre>;
                 } else {
-                    return <p key={index} className="text-sm">{part}</p>;
+                    return <Markdown key={index} className="text-sm">{part}</Markdown>;
                 }
             });
             return parts;
         } else {
-            return <p className="text-sm">{response.trim()}</p>;
+            return <Markdown className="text-sm">{response}</Markdown>;
         }
     };
 
@@ -92,7 +140,7 @@ const ChatWindow = ({ project }) => {
             <div className="relative h-full w-full z-[0]">
 
                 {/* Messages */}
-                <div className="h-[75vh] md:h-[76vh] relative overflow-y-auto p-4 space-y-4 bg-white">
+                <div className="h-[75vh] md:h-[76vh] relative overflow-y-auto p-4 w-full space-y-4 bg-white">
                     {chats.map((msg, index) => (
                         <div
                             key={index}
@@ -104,8 +152,10 @@ const ChatWindow = ({ project }) => {
                                     : "bg-gray-200 text-black"
                                     }`}
                             >
-                                <p className="text-xs opacity-60">{msg.email}</p>
-                                {formatResponse(msg.message)}
+                                <p className="text-xs opacity-80 pb-2">{msg.email}</p>
+                                <div className="text-sm">
+                                    {formatResponse(msg.message)}
+                                </div>
                             </div>
                         </div>
                     ))}
