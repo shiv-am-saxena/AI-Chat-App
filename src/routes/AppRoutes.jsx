@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import Login from '../screens/Login';
 import Register from '../screens/Register';
 import Home from '../screens/Home';
@@ -13,6 +13,7 @@ import Projects from '../screens/Projects';
 export default function AppRoutes() {
     const [loading, setLoading] = useState(true);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { isAuthenticated } = useSelector((state) => state.user);
     useEffect(() => {
         const fetchUserData = async () => {
@@ -20,7 +21,8 @@ export default function AppRoutes() {
             const token = localStorage.getItem('token');
             if (!token) {
                 setLoading(false);
-                return;
+                navigate('/');
+                return ;
             };
             dispatch(setLoad())
             try {
@@ -45,7 +47,7 @@ export default function AppRoutes() {
 
         }
         if (!isAuthenticated) fetchUserData();
-    }, [dispatch, isAuthenticated])
+    }, [dispatch, isAuthenticated, navigate])
 
     return loading ? (<h1 className='min-h-screen'>Loading...</h1>
     ) : (
