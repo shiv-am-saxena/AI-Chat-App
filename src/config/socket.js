@@ -3,7 +3,7 @@ import socket from 'socket.io-client';
 let socketInstance = null;
 
 const initializeSocket = (projectId) => {
-    socketInstance = socket(import.meta.env.VITE_API_URL, {
+    socketInstance = socket(import.meta.env.SOCKET, {
         auth: {
             token: localStorage.getItem('token'),
         },
