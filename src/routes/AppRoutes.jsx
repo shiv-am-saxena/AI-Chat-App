@@ -21,7 +21,6 @@ export default function AppRoutes() {
             const token = localStorage.getItem('token');
             if (!token) {
                 setLoading(false);
-                navigate('/');
                 return ;
             };
             dispatch(setLoad())
