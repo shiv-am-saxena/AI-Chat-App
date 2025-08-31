@@ -64,7 +64,6 @@ export default function AppRouter() {
                 <Route path={'sign-up'} element={<Signup />} />
             </Route>
             <Route path={'/dashboard'} element={isAuthenticated ? <Dashboard /> : <Navigate to={'/auth/sign-in'} replace/>} /> Protected Route 
-            {/* <Route path={'/dashboard'} element={<Dashboard />}/>  */}
             <Route path={'/error'} element={<Error404 />} />
             <Route path={'*'} element={<Navigate to={'/error'} replace />} />
         </Routes>
