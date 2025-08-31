@@ -23,18 +23,18 @@ const chatSlice = createSlice({
             state.isLoading = false;
             state.error = null;
         },
-        setLoading: (state) => {
+        chatLoading: (state) => {
             state.isLoading = true;
             state.error = null;
         },
-        setError: (state, action) => {
+        chatError: (state, action) => {
             state.error = action.payload;
             state.isLoading = false;
         }
     },
 });
 
-export const { setChats, addChat, setLoading, setError, removeChats } = chatSlice.actions;
+export const { setChats, addChat, chatLoading, chatError, removeChats } = chatSlice.actions;
 
 export const selectChats = (state) => state.chat.chats;
 

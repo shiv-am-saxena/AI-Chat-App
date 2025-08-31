@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { removeUser, setLoading, setError } from "../context/slices/userState";
@@ -7,15 +8,12 @@ import { FaUserCircle } from "react-icons/fa";
 import { FiChevronDown, FiLogOut, FiSettings, FiUser } from "react-icons/fi";
 import axios from "../config/axios";
 import { disconnectSocket } from "../config/socket";
+
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false); // Toggle for the mobile menu
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Toggle for profile dropdown
     const dispatch = useDispatch();
     const { isAuthenticated, user, isLoading } = useSelector((state) => state.user);
-    const navLinks = [
-        { name: "Sign In", slug: "/signin" },
-        { name: "Sign Up", slug: "/signup" },
-    ];
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -28,35 +26,41 @@ export default function Navbar() {
     };
 
     const handleLogout = async () => {
-        dispatch(setLoading());
+        dispatch(setLoading()); // Set loading state
+        try {
+            disconnectSocket(); // Disconnect socket safely
+        } catch (socketError) {
+            console.error("Error disconnecting socket:", socketError);
+        }
         const token = localStorage.getItem('token');
         try {
-            disconnectSocket();
-            const response = await axios.get('/auth/logout', {
+            const response = await axios.get("/auth/logout", {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
             const res = await response.data;
-            console.log(res);
             if (res.success) {
-                dispatch(removeUser());
-                localStorage.removeItem("token");
+                setIsDropdownOpen(false); // Close dropdown
+                dispatch(removeUser()); // Remove user from Redux state
+                localStorage.removeItem('token');
+                navigate("/"); // Redirect to home page
             }
-            navigate('/');
         } catch (error) {
-            dispatch(setError(error.response?.data?.message || "Something went wrong"));
-
+            console.error("Logout API error:", error);
+            dispatch(setError("Failed to log out. Please try again."));
+        } finally {
+            dispatch(removeUser()); // Ensure user is logged out locally
         }
     };
 
     return (
-        <nav className="h-20 w-full sticky top-0 shadow-md z-10 bg-gray-700">
-            <div className="flex justify-between items-center px-5 lg:px-20 py-4">
+        <nav className="h-16 w-full sticky top-0 shadow-md border-b border-[#333] z-10 backdrop-blur-sm">
+            <div className="flex h-full justify-between items-center px-5 lg:px-60">
                 {/* Logo */}
-                <h1 className="text-2xl font-[montserrat] tracking-tighter text-white md:text-4xl">
-                    Adhyay-AI Chat
-                </h1>
+                <Link to="/" className="text-2xl font-inter tracking-tighter text-white">
+                    Adhyay AI
+                </Link>
 
                 {/* Hamburger Menu */}
                 <motion.div
@@ -65,7 +69,7 @@ export default function Navbar() {
                     initial={{ rotate: 0 }}
                     animate={{ rotate: isOpen ? 90 : 0 }}
                     transition={{ duration: 0.3 }}
-                    style={{ width: "50px", height: "50px" }}
+                    style={{ width: "30px", height: "30px" }}
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -84,20 +88,13 @@ export default function Navbar() {
                 </motion.div>
 
                 {/* Desktop Links */}
-                <div className="hidden md:flex md:gap-5 lg:gap-10 text-white md:text-md lg:text-xl">
-                    <Link to='/' className="relative group px-1">
-                        <span>Home</span>
-                        <span
-                            className={`absolute inset-x-0 bottom-0 h-[1px] bg-white transition-all duration-300 group-hover:opacity-100 ${location.pathname === '/' ? "opacity-100" : "opacity-0"
-                                }`}
-                        ></span>
-                    </Link>
+                <div className="hidden md:flex md:gap-5 lg:gap-10 text-white md:text-md items-center">
                     {isAuthenticated ? (
                         <>
-                            <Link to='/projects' className="relative group px-1">
+                            <Link to="/dashboard" className="relative group px-1">
                                 <span>Projects</span>
                                 <span
-                                    className={`absolute inset-x-0 bottom-0 h-[1px] bg-white transition-all duration-300 group-hover:opacity-100 ${location.pathname === '/projects' ? "opacity-100" : "opacity-0"
+                                    className={`absolute inset-x-0 bottom-0 h-[1px] bg-white transition-all duration-300 group-hover:opacity-100 ${location.pathname === "/projects" ? "opacity-100" : "opacity-0"
                                         }`}
                                 ></span>
                             </Link>
@@ -132,44 +129,36 @@ export default function Navbar() {
                                         <li
                                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                                             onClick={handleLogout}
-                                        > <FiLogOut className="mr-2" />
-                                            {isLoading ? ("Processing") : (`Logout`)}
+                                        >
+                                            <FiLogOut className="mr-2" />
+                                            {isLoading ? "Processing" : "Logout"}
                                         </li>
                                     </ul>
                                 )}
                             </div>
                         </>
                     ) : (
-                        navLinks.map(({ name, slug }, index) => (
-                            <Link to={slug} key={index} className="relative group px-1">
-                                <span>{name}</span>
-                                <span
-                                    className={`absolute inset-x-0 bottom-0 h-[1px] bg-white transition-all duration-300 group-hover:opacity-100 ${location.pathname === slug ? "opacity-100" : "opacity-0"
-                                        }`}
-                                ></span>
+                        <>
+                            <Link to={'/auth/sign-in'}>
+                                Log in
                             </Link>
-                        ))
+                            <Link to={'/auth/sign-up'} className="bg-[#262626] px-3 py-2 rounded-md hover:bg-[#303030]">
+                                Sign up
+                            </Link>
+                        </>
                     )}
                 </div>
-            </div>
 
-            {/* Mobile Menu */}
+
+            </div>{/* Mobile Menu */}
             <div
-                className={`-mt-2 flex flex-col items-center bg-[#121212b9] backdrop-blur-lg text-white transition-all duration-300 overflow-hidden ${isOpen ? "max-h-[500px] py-5" : "max-h-0"
+                className={`flex flex-col items-center backdrop-blur-lg bg-black/50 border border-[#333] text-white transition-all duration-300 overflow-hidden ${isOpen ? "max-h-[500px] py-5" : "max-h-0"
                     } md:hidden`}
             >
-                <Link
-                    to='/'
-                    className={`w-full text-center py-2 ${location.pathname === '/' ? "text-white" : "text-gray-400"
-                        }`}
-                    onClick={() => setIsOpen(false)}
-                >
-                    Home
-                </Link>
                 {isAuthenticated ? (
                     <>
                         <Link
-                            to='/projects'
+                            to='/dashboard'
                             className={`w-full text-center py-2 ${location.pathname === '/projects' ? "text-white" : "text-gray-400"
                                 }`}
                             onClick={() => setIsOpen(false)}
@@ -211,17 +200,15 @@ export default function Navbar() {
                         )}
                     </>
                 ) : (
-                    navLinks.map(({ name, slug }, index) => (
-                        <Link
-                            to={slug}
-                            key={index}
-                            className={`w-full text-center py-2 ${location.pathname === slug ? "text-white" : "text-gray-400"
-                                }`}
-                            onClick={() => setIsOpen(false)}
-                        >
-                            {name}
+
+                    <>
+                        <Link to={'/auth/sign-in'}>
+                            Log in
                         </Link>
-                    ))
+                        <Link to={'/auth/sign-up'} className="bg-[#262626] mt-5 px-3 py-2 rounded-md hover:bg-[#303030]">
+                            Sign up
+                        </Link>
+                    </>
                 )}
             </div>
         </nav>

@@ -14,6 +14,7 @@ export const userStateSlice = createSlice({
             state.isLoading = true;
             state.error = null;
         },
+        
         setUser: (state, action) => {
             state.user = action.payload.user;
             state.token = action.payload.token;
@@ -31,9 +32,12 @@ export const userStateSlice = createSlice({
         setError: (state, action) => {
             state.error = action.payload;
             state.isLoading = false;
+        },
+        setToken: (state, action) => {
+            state.token = action.payload;
         }
     }
 });
 
-export const { setUser, removeUser, setLoading, setError } = userStateSlice.actions;
+export const { setUser, removeUser, setLoading, setError, setToken } = userStateSlice.actions;
 export default userStateSlice.reducer;

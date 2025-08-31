@@ -1,8 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
-/* eslint-disable react/prop-types */
-"use client";;
-import { cn } from "../lib/utils.js";
-import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "../../lib/utils.js";
+import { AnimatePresence } from "framer-motion";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 const ModalContext = createContext(undefined);

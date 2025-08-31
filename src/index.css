@@ -1,14 +1,67 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-*{
-    margin: 0;
-    padding: 0;
-    font-family:"Montserrat";
-    box-sizing: border-box;
+@import "tailwindcss";
+
+@theme {
+    --animate-shiny-text: shiny-text 8s infinite;
+
+    @keyframes shiny-text {
+
+        0%,
+        90%,
+        100% {
+            background-position: calc(-100% - var(--shiny-width)) 0;
+        }
+
+        30%,
+        60% {
+            background-position: calc(100% + var(--shiny-width)) 0;
+        }
+
+    }
+
 }
-html,body{
-    height:100%;
-    width:100%;
+
+
+@theme {
+    --animate-fade-up: fade-up 0.6s ease-out forwards;
+
+    @keyframes fade-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    --shadow-orange: 0px -100px 400px -25px rgba(255, 184, 0, 0.25);
+}
+
+@theme {
+    --animate-image-glow: image-glow 2s ease-in-out forwards;
+
+    @keyframes image-glow {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+}
+
+@theme inline {
+    --shadow-input:
+        0px 2px 3px -1px rgba(0, 0, 0, 0.1),
+        0px 1px 0px 0px rgba(25, 28, 33, 0.02),
+        0px 0px 0px 1px rgba(25, 28, 33, 0.08);
+}
+
+
+.chat-screen{
+    background: url('bg-dense.webp');
+    background-size: contain;
 }
