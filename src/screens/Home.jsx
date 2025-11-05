@@ -30,11 +30,11 @@ export default function Home() {
                     className="inline-flex mx-auto w-fit items-center justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50  shadow h-9 px-4 py-2 translate-y-[-1rem] animate-fade-in gap-1 bg-white rounded-lg text-black ease-in-out [--animation-delay:600ms]" onClick={() => (navigate('/auth/sign-in'))}>
                     <span>Get Started for free </span><RxArrowRight />
                 </button>
-                <div className="relative mt-[8rem] animate-fade-up opacity-0 [--animation-delay:400ms] [perspective:2000px] after:absolute after:inset-0 after:z-50 after:[background:linear-gradient(to_top,rgba(0,0,0,1)_25%,transparent_100%)]">
+                <div className="relative mt-[2rem] animate-fade-up opacity-0 [--animation-delay:400ms] [perspective:2000px] after:absolute after:inset-0 after:z-50 after:[background:linear-gradient(to_top,rgba(0,0,0,1)_5%,transparent_50%)]">
 
-                    <div className="rounded-xl border border-[#333] bg-white bg-opacity-[0.01] before:absolute before:bottom-1/2 before:left-0 before:top-0 before:h-full before:w-full before:opacity-0 before:[filter:blur(180px)] before:[background:linear-gradient(to_bottom,#ffbd7a,#ffbd7a,transparent_20%)] before:animate-image-glow">
-                        <BorderBeam duration={12} size={150} />
-                        <img src="./image.png" className="relative w-full h-full rounded-[inherit] border border-[#333] object-contain z-auto" />
+                    <div className="rounded-xl before:absolute before:bottom-1/2 before:left-0 before:top-0 before:h-full before:w-full before:opacity-0 before:[filter:blur(180px)] before:[background:linear-gradient(to_bottom,#ffbd7a,#ffbd7a,transparent_20%)] before:animate-image-glow">
+                        {/* <BorderBeam duration={12} size={150} /> */}
+                        <img src="./image.png" className="relative w-full h-full rounded-[inherit] object-contain z-auto" />
                     </div>
                 </div>
 
